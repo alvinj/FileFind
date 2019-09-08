@@ -31,7 +31,7 @@ extends SimpleFileVisitor[Path] {
             val canonFilename = file.toAbsolutePath.toString
             val matchingLineNumbers = findMatchingLineNumbers(canonFilename, searchPattern)
             if (findMatchingLineNumbers(canonFilename, searchPattern).size > 0) {
-                printMatchingLineNumbers(canonFilename, matchingLineNumbers)
+                printMatchingLineNumbers(canonFilename, matchingLineNumbers, searchPattern)
             }
         }
 
@@ -45,20 +45,27 @@ extends SimpleFileVisitor[Path] {
          */
     }
 
+
     /**
      * Create an “underline” string that’s the same length as the input string.
      * {{{
-     *    val s = "foobar"
-     *    val u = makeUnderline(s)
-     *    println(u) // "------"
+     *     val s = "foobar"
+     *     val u = makeUnderline(s)
+     *     println(u)  // "------"
      * }}}
      */
-    private def makeUnderline(s: String) =  List.fill(s.length)('-').mkString
+    private def makeUnderline(s: String) = List.fill(s.length)('-').mkString
+
 
     /**
      * Only call this method when you know the `filename` contains matches.
      */
-    private def printMatchingLineNumbers(filename: String, matchingLineNumbers: Seq[Int]): Unit = {
+    private def printMatchingLineNumbers(
+        filename: String, 
+        matchingLineNumbers: Seq[Int],
+        theSearchPattern: String
+    ): Unit = {
+        // TODO handle Before and After
         val underline = makeUnderline(filename)
         println("")
         println(filename)
@@ -67,15 +74,32 @@ extends SimpleFileVisitor[Path] {
         val bufferedSource = Source.fromFile(filename)
         for (line <- bufferedSource.getLines) {
             lineNum += 1
+            /**
+             * Highlights the search pattern within the string `line`.
+             * It currently makes the search pattern bold and underlined.
+             */
             if (matchingLineNumbers.contains(lineNum)) {
-                //TODO only make the matching word/pattern bold
-                println(s"\033[1m${line}\033[0m")
+                println(highlightSearchPattern(line, theSearchPattern))
             }
         }
         bufferedSource.close
         println("")
     }
 
+    /**
+     * Highlights the search pattern within the string `line`.
+     * It currently makes the search pattern bold and underlined.
+     * The output string is intended to be shown in an ANSI terminal,
+     * and I can confirm that it works with the MacOS Terminal.
+     * 
+     * More info on escape sequences: 
+     * stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
+     */
+    private def highlightSearchPattern(line: String, theSearchPattern: String): String =
+        line.replaceAll(
+            theSearchPattern,
+            s"\033[1;4m${theSearchPattern}\033[0m"
+        )
 
     private def findMatchingLineNumbers(filename: String, pattern: String): Seq[Int] = {
         val matchingLineNumbers = ArrayBuffer[Int]()
