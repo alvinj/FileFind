@@ -55,7 +55,7 @@ object FileUtils {
         lineNumsWherePatternFound: Seq[Int],
         linesBefore: Int,
         linesAfter: Int
-    ): Seq[Int] = {
+    ): Set[Int] = {
         val allLinesToPrint = ArrayBuffer[Int]()
         for (lineNum <- lineNumsWherePatternFound) {
             val firstLine = lineNum - linesBefore  //NOTE could be < 0
@@ -63,13 +63,13 @@ object FileUtils {
             if (firstLine == lastLine) {
                 allLinesToPrint += firstLine
             } else {
-                allLinesToPrint ++= Range(firstLine, lastLine)
+                allLinesToPrint ++= Range(firstLine, lastLine+1)
             }
         }
-        allLinesToPrint.toSeq
+        allLinesToPrint.toSet
     }
 
-    private def inListOfLinesToPrint(lineNum: Int, list: Seq[Int]) = list.contains(lineNum)
+    private def inListOfLinesToPrint(lineNum: Int, list: Set[Int]) = list.contains(lineNum)
 
     /**
      * Find all of the line numbers in the file that match the pattern.
