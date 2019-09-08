@@ -11,7 +11,7 @@ object FileUtils {
     /**
      * Only call this method when you know the `filename` contains matches.
      */
-    def printMatchingLineNumbers(
+    def printMatchingLines(
         filename: String, 
         lineNumsWherePatternFound: Seq[Int],
         theSearchPattern: String,
@@ -19,20 +19,11 @@ object FileUtils {
         linesAfter: Int
     ): Unit = {
 
-        val allLinesToPrint = ArrayBuffer[Int]()
-        for (lineNum <- lineNumsWherePatternFound) {
-            val firstLine = lineNum - linesBefore  //TODO could be < 0
-            val lastLine = lineNum + linesAfter    //TODO could be > file_length
-            if (firstLine == lastLine) {
-                allLinesToPrint += firstLine
-            } else {
-                val newLines = Range(firstLine, lastLine).toList  //(10,14)
-                allLinesToPrint ++= newLines
-            }
-        }
+        printFilename(filename)
 
-        val underline = makeUnderline(filename)
-        println(s"\n${filename}\n${underline}")
+        val allLinesToPrint = createListOfLinesToPrint(
+            lineNumsWherePatternFound, linesBefore, linesAfter
+        )
 
         var inARange = false
         var lineNum = 0
@@ -52,18 +43,52 @@ object FileUtils {
         bufferedSource.close
     }
 
-    def inListOfLinesToPrint(lineNum: Int, list: Seq[Int]) = list.contains(lineNum)
+    private def printFilename(filename: String): Unit = {
+        val underline = makeUnderline(filename)
+        println(s"\n${filename}\n${underline}")
+    }
 
+    /**
+     * Create a list of all lines in the file that should be printed.
+     */
+    private def createListOfLinesToPrint(
+        lineNumsWherePatternFound: Seq[Int],
+        linesBefore: Int,
+        linesAfter: Int
+    ): Seq[Int] = {
+        val allLinesToPrint = ArrayBuffer[Int]()
+        for (lineNum <- lineNumsWherePatternFound) {
+            val firstLine = lineNum - linesBefore  //NOTE could be < 0
+            val lastLine = lineNum + linesAfter    //NOTE could be > file_length
+            if (firstLine == lastLine) {
+                allLinesToPrint += firstLine
+            } else {
+                allLinesToPrint ++= Range(firstLine, lastLine)
+            }
+        }
+        allLinesToPrint.toSeq
+    }
+
+    private def inListOfLinesToPrint(lineNum: Int, list: Seq[Int]) = list.contains(lineNum)
+
+    /**
+     * Find all of the line numbers in the file that match the pattern.
+     */
     def findMatchingLineNumbers(filename: String, pattern: String): Seq[Int] = {
         val matchingLineNumbers = ArrayBuffer[Int]()
         var lineNum = 0
         val bufferedSource = Source.fromFile(filename)
         for (line <- bufferedSource.getLines) {
             lineNum += 1
-            if (line.contains(pattern)) matchingLineNumbers += lineNum
+            if (lineContainsStringOrPattern(line, pattern)) matchingLineNumbers += lineNum
         }
         bufferedSource.close
         matchingLineNumbers.toSeq
     }
+
+    private def lineContainsStringOrPattern(line: String, pattern: String): Boolean =
+        if (line.contains(pattern)) true
+        else if (line.matches(pattern)) true
+        else false
 
 }

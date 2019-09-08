@@ -15,7 +15,7 @@ extends SimpleFileVisitor[Path] {
     var pathMatcher: PathMatcher = null
     var numMatches = 0
 
-    // "glob:" is part of the syntax
+    // note: "glob:" is part of the syntax
     // https://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html#getPathMatcher-java.lang.String-
     pathMatcher = FileSystems.getDefault()
         .getPathMatcher("glob:" + filePattern)
@@ -28,7 +28,7 @@ extends SimpleFileVisitor[Path] {
             val canonFilename = file.toAbsolutePath.toString
             val matchingLineNumbers = findMatchingLineNumbers(canonFilename, searchPattern)
             if (findMatchingLineNumbers(canonFilename, searchPattern).size > 0) {
-                printMatchingLineNumbers(
+                printMatchingLines(
                     canonFilename, matchingLineNumbers, searchPattern, linesBefore, linesAfter
                 )
             }

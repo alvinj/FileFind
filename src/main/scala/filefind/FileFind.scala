@@ -4,21 +4,19 @@ import java.io._
 import java.nio.file._
 import java.nio.file.attribute._
 import java.util._
-import java.nio.file.FileVisitResult._  //static
-import java.nio.file.FileVisitOption._  //static
+import java.nio.file.FileVisitResult._
+import java.nio.file.FileVisitOption._
 import scopt.OParser
 
 object FileFind extends App {
 
-    // MAIN
-    //if (args.length < 3 || !args(1).equals("-name")) usage()
-    
+    // use the “scopt” library to get the command-line options
     case class Config(
-        searchDir: String = "",         //search dir
-        searchPattern: String = "",     //filePattern to search for
-        filenamePattern: String = "",   //filename filePattern to search for
-        before: Int = 0,
-        after: Int = 0
+        searchDir: String = "",         //directory to search
+        searchPattern: String = "",     //pattern to look for inside files
+        filenamePattern: String = "",   //filename pattern to search for
+        before: Int = 0,                //lines to print before each match
+        after: Int = 0                  //lines to print after each match
     )
 
     val builder = OParser.builder[Config]
@@ -30,17 +28,17 @@ object FileFind extends App {
         opt[String]('d', "dir")
             .required()
             .action((x, c) => c.copy(searchDir = x))
-            .text("required"),
+            .text("required; the directory to search"),
         opt[String]('p', "search-pattern")
             .required()
-            .valueName("[searchPattern] (like 'StringBuilder')")
+            .valueName("[searchPattern] (like 'StringBuilder' or '^void.*main.*')")
             .action((x, c) => c.copy(searchPattern = x))
-            .text("required"),
+            .text("required; regex patterns must match the full line"),
         opt[String]('f', "filename-pattern")
             .required()
             .valueName("[filenamePattern] (like '*.java')")
             .action((x, c) => c.copy(filenamePattern = x))
-            .text("required"),
+            .text("required; the filenames to search"),
         opt[Int]('b', "before")
             .valueName("[before] (the number of lines BEFORE the search pattern to print, like 1 or 2)")
             .action((x, c) => c.copy(before = x)),
@@ -52,30 +50,24 @@ object FileFind extends App {
 
     OParser.parse(parser1, args, Config()) match {
         case Some(config) =>
-          doTheSearch(config)
+            doTheSearch(config)
         case _ =>
-          // arguments are bad, error message will have been displayed
+            // arguments are bad, error message will have been displayed
+            println("")
     }
 
-    //def doTheSearch(parser: OParser[Unit,Config]) = {
-    def doTheSearch(config: Config) = {
-        //val startingDir: Path = Paths.get(args(0))
-        //val filePattern = args(2)   // "*java"
-
-        val startingDir = config.searchDir
-        val searchPattern = config.searchPattern
-        val filenamePattern = config.filenamePattern
-        val linesBefore = config.before
-        val linesAfter = config.after
-    
-        val finder = new Finder(filenamePattern, searchPattern, linesBefore, linesAfter)
-        Files.walkFileTree(Paths.get(startingDir), finder)
-        finder.done()
-    
-        // def usage(): Unit = {
-        //     System.err.println("java Find <path>" + " -name \"<glob_pattern>\"")
-        //     System.exit(-1)
-        // }
+    def doTheSearch(config: Config) = {    
+        val finder = new Finder(
+            config.filenamePattern, 
+            config.searchPattern, 
+            config.before, 
+            config.after
+        )
+        Files.walkFileTree(
+            Paths.get(config.searchDir), 
+            finder
+        )
+        finder.done()    
     }
 
 
