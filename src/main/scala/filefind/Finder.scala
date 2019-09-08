@@ -45,6 +45,14 @@ extends SimpleFileVisitor[Path] {
          */
     }
 
+    /**
+     * Create an “underline” string that’s the same length as the input string.
+     * {{{
+     *    val s = "foobar"
+     *    val u = makeUnderline(s)
+     *    println(u) // "------"
+     * }}}
+     */
     private def makeUnderline(s: String) =  List.fill(s.length)('-').mkString
 
     /**
@@ -59,7 +67,10 @@ extends SimpleFileVisitor[Path] {
         val bufferedSource = Source.fromFile(filename)
         for (line <- bufferedSource.getLines) {
             lineNum += 1
-            if (matchingLineNumbers.contains(lineNum)) println(line)
+            if (matchingLineNumbers.contains(lineNum)) {
+                //TODO only make the matching word/pattern bold
+                println(s"\033[1m${line}\033[0m")
+            }
         }
         bufferedSource.close
         println("")
