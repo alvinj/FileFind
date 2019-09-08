@@ -42,10 +42,10 @@ object FileFind extends App {
             .action((x, c) => c.copy(filenamePattern = x))
             .text("required"),
         opt[Int]('b', "before")
-            .valueName("[before] (an int, like 1 or 2)")
+            .valueName("[before] (the number of lines BEFORE the search pattern to print, like 1 or 2)")
             .action((x, c) => c.copy(before = x)),
         opt[Int]('a', "after")
-            .valueName("[after] (an int, like 1 or 2)")
+            .valueName("[after]   (the number of lines AFTER the search pattern to print, like 1 or 2)")
             .action((x, c) => c.copy(after = x))
       )
     }

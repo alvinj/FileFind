@@ -45,7 +45,6 @@ extends SimpleFileVisitor[Path] {
          */
     }
 
-
     /**
      * Create an “underline” string that’s the same length as the input string.
      * {{{
@@ -55,7 +54,6 @@ extends SimpleFileVisitor[Path] {
      * }}}
      */
     private def makeUnderline(s: String) = List.fill(s.length)('-').mkString
-
 
     /**
      * Only call this method when you know the `filename` contains matches.
@@ -67,23 +65,16 @@ extends SimpleFileVisitor[Path] {
     ): Unit = {
         // TODO handle Before and After
         val underline = makeUnderline(filename)
-        println("")
-        println(filename)
-        println(underline)
+        println(s"\n${filename}\n${underline}")
         var lineNum = 0
         val bufferedSource = Source.fromFile(filename)
         for (line <- bufferedSource.getLines) {
             lineNum += 1
-            /**
-             * Highlights the search pattern within the string `line`.
-             * It currently makes the search pattern bold and underlined.
-             */
             if (matchingLineNumbers.contains(lineNum)) {
-                println(highlightSearchPattern(line, theSearchPattern))
+                println(highlightSearchPatternForAnsiTerminals(line, theSearchPattern))
             }
         }
         bufferedSource.close
-        println("")
     }
 
     /**
@@ -95,7 +86,7 @@ extends SimpleFileVisitor[Path] {
      * More info on escape sequences: 
      * stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
      */
-    private def highlightSearchPattern(line: String, theSearchPattern: String): String =
+    private def highlightSearchPatternForAnsiTerminals(line: String, theSearchPattern: String): String =
         line.replaceAll(
             theSearchPattern,
             s"\033[1;4m${theSearchPattern}\033[0m"
