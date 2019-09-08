@@ -20,7 +20,6 @@ object FileUtils {
     ): Unit = {
 
         val allLinesToPrint = ArrayBuffer[Int]()
-
         for (lineNum <- lineNumsWherePatternFound) {
             val firstLine = lineNum - linesBefore  //TODO could be < 0
             val lastLine = lineNum + linesAfter    //TODO could be > file_length
@@ -34,16 +33,26 @@ object FileUtils {
 
         val underline = makeUnderline(filename)
         println(s"\n${filename}\n${underline}")
+
+        var inARange = false
         var lineNum = 0
         val bufferedSource = Source.fromFile(filename)
         for (line <- bufferedSource.getLines) {
             lineNum += 1
-            if (allLinesToPrint.contains(lineNum)) {
+            if (inListOfLinesToPrint(lineNum, allLinesToPrint)) {
+                inARange = true
                 println(highlightSearchPatternForAnsiTerminals(line, theSearchPattern))
+            }
+            else if (inARange && !inListOfLinesToPrint(lineNum, allLinesToPrint)) {
+                // you were in a range, and now you’re not
+                inARange = false
+                println("")
             }
         }
         bufferedSource.close
     }
+
+    def inListOfLinesToPrint(lineNum: Int, list: Seq[Int]) = list.contains(lineNum)
 
     def findMatchingLineNumbers(filename: String, pattern: String): Seq[Int] = {
         val matchingLineNumbers = ArrayBuffer[Int]()
