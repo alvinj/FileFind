@@ -3,9 +3,11 @@ package filefind
 import java.io._
 import java.nio.file._
 import java.nio.file.attribute._
-import java.util._
+//import java.util.
 import java.nio.file.FileVisitResult._  //static
 import java.nio.file.FileVisitOption._  //static
+import scala.collection.mutable.ArrayBuffer
+import scala.io.Source
 
 class Finder (filePattern: String, searchPattern: String)
 extends SimpleFileVisitor[Path] {
@@ -27,8 +29,9 @@ extends SimpleFileVisitor[Path] {
         if (name != null && matcher.matches(name)) {
             numMatches += 1
             val canonFilename = file.toAbsolutePath.toString
-            if (fileContainsPattern(canonFilename, searchPattern)) {
-                println(s"MATCHED $file")
+            val matchingLineNumbers = findMatchingLineNumbers(canonFilename, searchPattern)
+            if (findMatchingLineNumbers(canonFilename, searchPattern).size > 0) {
+                printMatchingLineNumbers(canonFilename, matchingLineNumbers)
             }
         }
 
@@ -38,27 +41,42 @@ extends SimpleFileVisitor[Path] {
          *     - find all lines in the file that match (matchingLineNumbers:List[Int])
          *     - go back through the file and get the before and after lines
          *       as well as the desired line
+         *     - print the output as desired
          */
     }
 
-    private def fileContainsPattern(filename: String, pattern: String): Boolean = {
-        var containsPattern = false
+    private def makeUnderline(s: String) =  List.fill(s.length)('-').mkString
 
-        // println(s"searching $filename ...")
-        val br = new BufferedReader(new FileReader(filename))
-        var line = ""
-        while ({line = br.readLine; line != null}) {
-            if (line.contains(pattern)) {
-                containsPattern = true
-                //println(s"MATCHED $filename")
-            } 
+    /**
+     * Only call this method when you know the `filename` contains matches.
+     */
+    private def printMatchingLineNumbers(filename: String, matchingLineNumbers: Seq[Int]): Unit = {
+        val underline = makeUnderline(filename)
+        println("")
+        println(filename)
+        println(underline)
+        var lineNum = 0
+        val bufferedSource = Source.fromFile(filename)
+        for (line <- bufferedSource.getLines) {
+            lineNum += 1
+            if (matchingLineNumbers.contains(lineNum)) println(line)
         }
-        br.close
-
-        containsPattern
+        bufferedSource.close
+        println("")
     }
 
 
+    private def findMatchingLineNumbers(filename: String, pattern: String): Seq[Int] = {
+        val matchingLineNumbers = ArrayBuffer[Int]()
+        var lineNum = 0
+        val bufferedSource = Source.fromFile(filename)
+        for (line <- bufferedSource.getLines) {
+            lineNum += 1
+            if (line.contains(pattern)) matchingLineNumbers += lineNum
+        }
+        bufferedSource.close
+        matchingLineNumbers.toSeq
+    }
 
     // prints the total number of matches to standard out
     def done() = {
