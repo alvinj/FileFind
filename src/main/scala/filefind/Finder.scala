@@ -12,21 +12,18 @@ import FileUtils._
 class Finder (filePattern: String, searchPattern: String)
 extends SimpleFileVisitor[Path] {
 
-    var matcher: PathMatcher = null
+    var pathMatcher: PathMatcher = null
     var numMatches = 0
-    //private final PathMatcher matcher;
-    //private int numMatches = 0;
 
     // "glob:" is part of the syntax
     // https://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html#getPathMatcher-java.lang.String-
-    matcher = FileSystems.getDefault()
-                .getPathMatcher("glob:" + filePattern);
+    pathMatcher = FileSystems.getDefault()
+        .getPathMatcher("glob:" + filePattern)
 
     // compares the glob filePattern against the file or directory name
     def find(file: Path): Unit = {
         val name: Path = file.getFileName()
-
-        if (name != null && matcher.matches(name)) {
+        if (name != null && pathMatcher.matches(name)) {
             numMatches += 1
             val canonFilename = file.toAbsolutePath.toString
             val matchingLineNumbers = findMatchingLineNumbers(canonFilename, searchPattern)
@@ -38,7 +35,7 @@ extends SimpleFileVisitor[Path] {
 
     // prints the total number of matches to standard out
     def done() = {
-        println("Matched: " + numMatches)
+        println(s"Searched $numMatches $filePattern files.\n")
     }
     
     // invoke the filePattern matching method on each file
