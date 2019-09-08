@@ -1,3 +1,5 @@
+package filefind
+
 import java.io._
 import java.nio.file._
 import java.nio.file.attribute._
@@ -14,7 +16,9 @@ object FileFind extends App {
     case class Config(
         searchDir: String = "",         //search dir
         searchPattern: String = "",     //filePattern to search for
-        filenamePattern: String = ""    //filename filePattern to search for
+        filenamePattern: String = "",   //filename filePattern to search for
+        before: Int = 0,
+        after: Int = 0
     )
 
     val builder = OParser.builder[Config]
@@ -27,16 +31,22 @@ object FileFind extends App {
             .required()
             .action((x, c) => c.copy(searchDir = x))
             .text("required"),
-        opt[String]('p', "search-filePattern")
+        opt[String]('p', "search-pattern")
             .required()
             .valueName("[searchPattern] (like 'StringBuilder')")
             .action((x, c) => c.copy(searchPattern = x))
             .text("required"),
-        opt[String]('f', "filename-filePattern")
+        opt[String]('f', "filename-pattern")
             .required()
             .valueName("[filenamePattern] (like '*.java')")
             .action((x, c) => c.copy(filenamePattern = x))
             .text("required"),
+        opt[Int]('b', "before")
+            .valueName("[before] (an int, like 1 or 2)")
+            .action((x, c) => c.copy(before = x)),
+        opt[Int]('a', "after")
+            .valueName("[after] (an int, like 1 or 2)")
+            .action((x, c) => c.copy(after = x))
       )
     }
 
@@ -70,54 +80,6 @@ object FileFind extends App {
 }
 
 
-class Finder (filePattern: String, searchPattern: String)
-extends SimpleFileVisitor[Path] {
-
-    var matcher: PathMatcher = null
-    var numMatches = 0
-    //private final PathMatcher matcher;
-    //private int numMatches = 0;
-
-    // "glob:" is part of the syntax
-    // https://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html#getPathMatcher-java.lang.String-
-    matcher = FileSystems.getDefault()
-                .getPathMatcher("glob:" + filePattern);
-
-    // compares the glob filePattern against the file or directory name
-    def find(file: Path): Unit = {
-        // don’t do anything with directories
-        //if (file.toFile().isDirectory()) return;
-        val name: Path = file.getFileName()
-        if (name != null && matcher.matches(name)) {
-            numMatches += 1
-            println(s"FILE: $file")
-        }
-    }
-
-    // prints the total number of matches to standard out
-    def done() = {
-        println("Matched: " + numMatches)
-    }
-    
-    // invoke the filePattern matching method on each file
-    override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
-        find(file)
-        return CONTINUE
-    }
-
-    // invoke the filePattern matching method on each directory
-    override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = {
-        find(dir)
-        return CONTINUE
-    }
-
-    override def visitFileFailed(file: Path, ioe: IOException): FileVisitResult = {
-        System.err.println(ioe)
-        return CONTINUE
-    }
-    
-
-}
 
 
 
