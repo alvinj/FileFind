@@ -26,5 +26,6 @@ object StringUtils {
      * }}}
      */
     def makeUnderline(s: String) = List.fill(s.length)('-').mkString
+    //def dash(s: String) = "-"*s.length  //via twitter
 
 }

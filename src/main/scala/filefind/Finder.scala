@@ -9,7 +9,7 @@ import scala.io.Source
 import StringUtils._
 import FileUtils._
 
-class Finder (filePattern: String, searchPattern: String)
+class Finder (filePattern: String, searchPattern: String, linesBefore: Int, linesAfter: Int)
 extends SimpleFileVisitor[Path] {
 
     var pathMatcher: PathMatcher = null
@@ -28,12 +28,13 @@ extends SimpleFileVisitor[Path] {
             val canonFilename = file.toAbsolutePath.toString
             val matchingLineNumbers = findMatchingLineNumbers(canonFilename, searchPattern)
             if (findMatchingLineNumbers(canonFilename, searchPattern).size > 0) {
-                printMatchingLineNumbers(canonFilename, matchingLineNumbers, searchPattern)
+                printMatchingLineNumbers(
+                    canonFilename, matchingLineNumbers, searchPattern, linesBefore, linesAfter
+                )
             }
         }
     }
 
-    // prints the total number of matches to standard out
     def done() = {
         println(s"Searched $numMatches $filePattern files.\n")
     }

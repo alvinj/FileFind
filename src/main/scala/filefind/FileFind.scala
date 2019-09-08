@@ -65,8 +65,10 @@ object FileFind extends App {
         val startingDir = config.searchDir
         val searchPattern = config.searchPattern
         val filenamePattern = config.filenamePattern
+        val linesBefore = config.before
+        val linesAfter = config.after
     
-        val finder = new Finder(filenamePattern, searchPattern)
+        val finder = new Finder(filenamePattern, searchPattern, linesBefore, linesAfter)
         Files.walkFileTree(Paths.get(startingDir), finder)
         finder.done()
     

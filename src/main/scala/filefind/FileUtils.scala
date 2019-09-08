@@ -4,6 +4,8 @@ import StringUtils._
 import scala.io.Source
 import scala.collection.mutable.ArrayBuffer
 
+case class LineRange(firstLine: Int, lastLine: Int)
+
 object FileUtils {
 
     /**
@@ -11,17 +13,32 @@ object FileUtils {
      */
     def printMatchingLineNumbers(
         filename: String, 
-        matchingLineNumbers: Seq[Int],
-        theSearchPattern: String
+        lineNumsWherePatternFound: Seq[Int],
+        theSearchPattern: String,
+        linesBefore: Int,
+        linesAfter: Int
     ): Unit = {
-        // TODO handle Before and After
+
+        val allLinesToPrint = ArrayBuffer[Int]()
+
+        for (lineNum <- lineNumsWherePatternFound) {
+            val firstLine = lineNum - linesBefore  //TODO could be < 0
+            val lastLine = lineNum + linesAfter    //TODO could be > file_length
+            if (firstLine == lastLine) {
+                allLinesToPrint += firstLine
+            } else {
+                val newLines = Range(firstLine, lastLine).toList  //(10,14)
+                allLinesToPrint ++= newLines
+            }
+        }
+
         val underline = makeUnderline(filename)
         println(s"\n${filename}\n${underline}")
         var lineNum = 0
         val bufferedSource = Source.fromFile(filename)
         for (line <- bufferedSource.getLines) {
             lineNum += 1
-            if (matchingLineNumbers.contains(lineNum)) {
+            if (allLinesToPrint.contains(lineNum)) {
                 println(highlightSearchPatternForAnsiTerminals(line, theSearchPattern))
             }
         }
