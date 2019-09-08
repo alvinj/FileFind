@@ -32,7 +32,8 @@ object FileUtils {
             lineNum += 1
             if (inListOfLinesToPrint(lineNum, allLinesToPrint)) {
                 inARange = true
-                println(highlightSearchPatternForAnsiTerminals(line, theSearchPattern))
+                println(f"${lineNum}%4d: ${highlightSearchPatternForAnsiTerminals(line, theSearchPattern)}")
+                //println(f"${x}%4d:")
             }
             else if (inARange && !inListOfLinesToPrint(lineNum, allLinesToPrint)) {
                 // you were in a range, and now you’re not
