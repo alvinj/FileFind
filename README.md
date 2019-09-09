@@ -68,8 +68,8 @@ After that, copy the `ff` executable to your *~/bin* directory, or somewhere sim
 
 ## More information
 
+For more information, see my [Scala “file find” command blog post](https://alvinalexander.com/scala/scala-file-find-utility-command).
 
+Alvin Alexander  
+https://alvinalexander.com
 
-
-
-        
