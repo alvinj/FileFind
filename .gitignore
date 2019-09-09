@@ -1,4 +1,5 @@
-
+Graal/ff
+Graal/*.jar
 bin/
 target/
 project/target/

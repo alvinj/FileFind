@@ -14,7 +14,7 @@ object StringUtils {
     def highlightSearchPatternForAnsiTerminals(line: String, theSearchPattern: String): String =
         line.replaceAll(
             theSearchPattern,
-            s"\033[1;4m${theSearchPattern}\033[0m"
+            s"\033[4m${theSearchPattern}\033[0m"
         )
 
     /**
