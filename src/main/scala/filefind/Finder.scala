@@ -45,9 +45,9 @@ extends SimpleFileVisitor[Path] {
         return CONTINUE
     }
 
-    // invoke the filePattern matching method on each directory
+    // invoke the filePattern matching method on each directory.
+    // (ff: do nothing for directories)
     override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = {
-        find(dir)
         return CONTINUE
     }
 
