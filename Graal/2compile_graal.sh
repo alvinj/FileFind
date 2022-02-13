@@ -1,7 +1,7 @@
 
 # this script assumes that this file was already created
 # with `sbt package` or `sbt assembly`
-JAR_FILE=FileFind-assembly-0.1.jar
+JAR_FILE=FileFind-assembly-0.2.jar
 COMMAND_NAME=ff
 
 echo "copying JAR file to current dir ..."

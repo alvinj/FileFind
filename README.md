@@ -57,13 +57,20 @@ Sample output looks like this:
 I initially build the app with [sbt-assembly](https://github.com/sbt/sbt-assembly), then create an executable with GraalVM. The steps are:
 
 - Run `sbt assembly`, or run `assembly` from the SBT prompt
-- That creates a JAR file named *target/scala-2.12/FileFind-assembly-0.1.jar*
+- That creates a JAR file named *target/scala-2.12/FileFind-assembly-0.2.jar*
 - `cd` into the *Graal* directory
 - Source the first file, i.e., `. 1setup_graal` (you’ll need to change that configuration for your system)
 - Then run `2compile_graal.sh` to create the `ff` executable with GraalVM
 
 After that, copy the `ff` executable to your *~/bin* directory, or somewhere similar.
 
+
+## Version history
+
+- 0.1, the initial release
+- 0.2, put a kludge in some file-reading code that was throwing exceptions
+  because some filename matches (like _main.dart) are really binary files
+  (TODO: fix that kludge).
 
 
 ## More information

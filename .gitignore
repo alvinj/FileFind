@@ -1,3 +1,5 @@
+.bsp/
+.vscode/
 Graal/ff
 Graal/*.jar
 bin/
