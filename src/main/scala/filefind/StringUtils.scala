@@ -1,5 +1,7 @@
 package filefind
 
+import io.AnsiColor._
+
 object StringUtils {
 
     /**
@@ -14,7 +16,7 @@ object StringUtils {
     def highlightSearchPatternForAnsiTerminals(line: String, theSearchPattern: String): String =
         line.replaceAll(
             theSearchPattern,
-            s"\033[4m${theSearchPattern}\033[0m"
+            s"${UNDERLINED}${theSearchPattern}${RESET}"
         )
 
     /**
